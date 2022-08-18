@@ -1,0 +1,83 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master
+
+pool:
+  name: "saaspepool"
+
+variables:
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    host: dev-api.saaspe.com
+    namespace: dev
+
+stages:
+  - stage: "build"
+    jobs:
+      - job: build
+        steps:
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'clean install'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              mavenVersionOption: 'Default'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: false
+
+          - task: Docker@2
+            displayName: "Build image and publish to acr"
+            inputs:
+              containerRegistry: 'saaspe-private-hub'
+              repository: 'saaspeapi'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              
+  - stage: "deploy"
+    jobs:
+      - job: deploy
+        steps:
+
+          - task: replacetokens@5
+            displayName: "Updating image values to deployment.yml"
+            inputs:
+              targetFiles: 'manifests/deployment.yml'
+              encoding: 'auto'
+              tokenPattern: 'custom'
+              tokenPrefix: '{#'
+              tokenSuffix: '#}'
+              writeBOM: true
+              verbosity: 'detailed'
+              actionOnMissing: 'warn'
+              keepToken: true
+              actionOnNoFiles: 'warn'
+              enableTransforms: true
+              transformPrefix: '{#'
+              transformSuffix: '#}'
+              inlineVariables: |
+                image: $(imagerepourl):$(Build.BuildId)
+                host: $(host)
+                namespace: $(namespace)
+              enableRecursion: false
+              useLegacyPattern: true
+              defaultValue: '191'
+              enableTelemetry: true
+
+          - task: Kubernetes@1
+            displayName: "Deploying to AKS"
+            inputs:
+              connectionType: "Azure Resource Manager"
+              azureSubscriptionEndpoint: "saaspe-resouce-group-svc"
+              azureResourceGroup: "saaspe"
+              kubernetesCluster: "saaspe-private-cluster"
+              namespace: $(namespace)
+              command: "apply"
+              useConfigurationFile: true
+              configuration: "manifests/deployment.yml"
+              containerRegistryType: "Azure Container Registry"
