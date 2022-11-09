@@ -83,7 +83,3 @@ stages:
               containerRegistryType: 'Azure Container Registry'
               azureSubscriptionEndpointForSecrets: 'saaspe-resouce-group-svc'
               azureContainerRegistry: 'saaspeprivatehub.azurecr.io'
-          - task: CmdLine@2
-            displayName: "Docker Clean"
-            inputs:
-              script: 'docker rmi ''$(saaspeprivatehub.azurecr.io/jenkins):$(Build.BuildId)'''
