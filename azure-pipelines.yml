@@ -85,4 +85,4 @@ stages:
           - task: CmdLine@2
             displayName: "Docker Clean"
             inputs:
-              script: 'docker rmi ''$(imagerepourl):$(Build.BuildId)'''
+              script: 'docker rmi ''$(saaspeprivatehub.azurecr.io/jenkins):$(Build.BuildId)'''
