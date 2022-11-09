@@ -35,7 +35,7 @@ stages:
             sonarQubeRunAnalysis: false
 
         - task: Docker@2
-          displayName: "Build and Push Docker Image to Acr"
+          displayName: "Build image and publish to acr"
           inputs:
             containerRegistry: 'saaspe-private-hub'
             repository: 'jenkins'
