@@ -41,7 +41,7 @@ stages:
             repository: 'jenkins'
             command: 'buildAndPush'
             Dockerfile: '**/Dockerfile'
-            tags: '(Build.BuildId)'
+            tags: 
 
               
   - stage: "deploy"
