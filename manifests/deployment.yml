@@ -17,7 +17,7 @@ spec:
         - name: jenkins-github-action
           image: {#image#}
           ports:
-            - containerPort: 80
+          - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
