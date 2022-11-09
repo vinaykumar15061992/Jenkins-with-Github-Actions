@@ -1,0 +1,89 @@
+
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  - main
+  - dev
+  - pre-prod
+  - sit
+
+pr: none
+pool:
+  name: "saaspepool"
+
+
+stages:
+  - stage: "build"
+    jobs:
+      - job: build
+        steps:
+
+        - task: Maven@3
+          displayName: "Maven Build"
+          inputs:
+            mavenPomFile: 'pom.xml'
+            goals: 'clean install'
+            publishJUnitResults: true
+            testResultsFiles: '**/surefire-reports/TEST-*.xml'
+            javaHomeOption: 'JDKVersion'
+            mavenVersionOption: 'Default'
+            mavenAuthenticateFeed: false
+            effectivePomSkip: false
+            sonarQubeRunAnalysis: false
+
+        - task: Docker@2
+          displayName: "Build image and publish to acr"
+          inputs:
+            containerRegistry: 'saaspe-private-hub'
+            repository: 'jenkins'
+            command: 'buildAndPush'
+            Dockerfile: '**/Dockerfile'
+            tags: '(Build.BuildId)'
+
+              
+  - stage: "deploy"
+    jobs:
+      - job: deploy
+        steps:
+
+          - task: replacetokens@5
+            displayName: "Updating image values to deployment.yml"
+            inputs:
+              targetFiles: 'manifests/deployment.yml'
+              encoding: 'auto'
+              tokenPattern: 'azpipelines'
+              writeBOM: true
+              verbosity: 'detailed'
+              actionOnMissing: 'warn'
+              keepToken: true
+              actionOnNoFiles: 'warn'
+              enableTransforms: true
+              transformPrefix: '{#'
+              transformSuffix: '#}'
+              enableRecursion: false
+              useLegacyPattern: true
+              defaultValue: '191'
+              enableTelemetry: true
+
+          - task: Kubernetes@1
+            displayName: "Deploying to AKS"
+            inputs:
+              connectionType: 'Azure Resource Manager'
+              azureSubscriptionEndpoint: 'saaspe-resouce-group-svc'
+              azureResourceGroup: 'saaspe'
+              kubernetesCluster: 'saaspe-private-cluster'
+              namespace: 'jenkins'
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: 'manifests/deployment.yml'
+              secretType: 'dockerRegistry'
+              containerRegistryType: 'Azure Container Registry'
+              azureSubscriptionEndpointForSecrets: 'saaspe-resouce-group-svc'
+              azureContainerRegistry: 'saaspeprivatehub.azurecr.io'
+          - task: CmdLine@2
+            displayName: "Docker Clean"
+            inputs:
+              script: 'docker rmi ''$(imagerepourl):$(Build.BuildId)'''
