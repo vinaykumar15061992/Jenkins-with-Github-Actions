@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: saaspe-api
-  namespace: dev
+  name: jenkins-github-action
+  namespace: jenkins
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: saaspe-api
+      app: jenkins-github-action
   template:
     metadata:
       labels:
-        app: saaspe-api
+        app: jenkins-github-action
     spec:
       containers:
-        - name: saaspe-api
+        - name: jenkins-github-action
           image: {#image#}
           ports:
             - containerPort: 80
@@ -22,14 +22,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: saaspe-api-svc
-  namespace: dev
+  name: jenkins-github-action-svc
+  namespace: jenkins
 spec:
   type: ClusterIP
   ports:
   - port: 80
   selector:
-    app: saaspe-api
+    app: jenkins-github-action
 ---
 # kind: ConfigMap
 # apiVersion: v1
@@ -43,26 +43,26 @@ spec:
 # #   REACT_APP_API_URL: "http://20.212.45.80:8081"
 # #   REACT_APP_API_BASE: "api"
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: saaspe-api-ingress
-  namespace: dev
-  annotations:
-    kubernetes.io/ingress.class: azure/application-gateway
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  tls:
-    - hosts:
-        - {#host#}
-  rules:
-    - host: {#host#}
-      http:
-        paths: 
-          - path: /
-            backend:
-              service:
-                name: saaspe-api-svc
-                port:
-                  number: 80
-            pathType: Prefix
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: saaspe-api-ingress
+#   namespace: dev
+#   annotations:
+#     kubernetes.io/ingress.class: azure/application-gateway
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   tls:
+#     - hosts:
+#         - {#host#}
+#   rules:
+#     - host: {#host#}
+#       http:
+#         paths: 
+#           - path: /
+#             backend:
+#               service:
+#                 name: saaspe-api-svc
+#                 port:
+#                   number: 80
+#             pathType: Prefix
