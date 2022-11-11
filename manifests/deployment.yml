@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: jenkins-github-action
-          image: saaspeprivatehub.azurecr.io/jenkins:$(Build.BuildId)
+          image: saaspeprivatehub.azurecr.io/jenkins:latest
           ports:
           - containerPort: 80
 ---
