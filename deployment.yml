@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jenkins-github-action
+  name: jenkins-dev
   namespace: jenkins
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jenkins-github-action
+      app: jenkins-dev
   template:
     metadata:
       labels:
-        app: jenkins-github-action
+        app: jenkins-dev
     spec:
       containers:
-        - name: jenkins-github-action
+        - name: jenkins-dev
           image: saaspeprivatehub.azurecr.io/jenkins:latest
           ports:
           - containerPort: 80
@@ -22,14 +22,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: jenkins-github-action-svc
+  name: jenkins-dev-svc
   namespace: jenkins
 spec:
   type: ClusterIP
   ports:
   - port: 80
   selector:
-    app: jenkins-github-action
+    app: jenkins-dev
 ---
 # kind: ConfigMap
 # apiVersion: v1
