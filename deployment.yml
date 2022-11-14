@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jenkins-sit
-  namespace: jenkins
+  namespace: sit
 spec:
   replicas: 1
   selector:
