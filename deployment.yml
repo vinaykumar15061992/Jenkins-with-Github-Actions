@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jenkins-dev
-  namespace: jenkins
+  namespace: dev
 spec:
   replicas: 1
   selector:
@@ -23,7 +23,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jenkins-dev-svc
-  namespace: jenkins
+  namespace: dev
 spec:
   type: ClusterIP
   ports:
