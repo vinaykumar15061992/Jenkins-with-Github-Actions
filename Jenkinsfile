@@ -1,7 +1,7 @@
 pipeline{
     agent any
     environment {
-        imagename = "saaspeprivatehub.azurecr.io/jenkins"
+        imagename = "saaspeprivatehub.azurecr.io/jenkins:pre-prod"
         registryCredential = 'Acr_Id'
         dockerImage = ''
         registryUrl = 'saaspeprivatehub.azurecr.io'
