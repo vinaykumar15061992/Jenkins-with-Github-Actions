@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: jenkins-preprod
-          image: saaspeprivatehub.azurecr.io/jenkins:$(Build.BuildId)
+          image: saaspeprivatehub.azurecr.io/jenkins:pre-prod
           ports:
           - containerPort: 80
 ---
