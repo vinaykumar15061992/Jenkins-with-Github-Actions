@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: jenkins-sit
-          image: saaspeprivatehub.azurecr.io/jenkins:$(Build.BuildId)
+          image: saaspeprivatehub.azurecr.io/jenkins:sit
           ports:
           - containerPort: 80
 ---
