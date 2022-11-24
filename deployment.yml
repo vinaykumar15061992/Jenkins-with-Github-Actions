@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: jenkins-prod
-          image: saaspeprivatehub.azurecr.io/jenkins:latest
+          image: saaspeprivatehub.azurecr.io/jenkins:prod
           ports:
           - containerPort: 80
 ---
